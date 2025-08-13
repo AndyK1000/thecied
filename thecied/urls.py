@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.http import HttpResponse
 
 def home(request):
@@ -44,10 +44,19 @@ def home(request):
                 <h3>🚀 What's Working:</h3>
                 <ul>
                     <li>✅ Django 5.2.4 running on Python 3.12</li>
+                    <li>✅ Django REST Framework API</li>
                     <li>✅ Apache web server with mod_wsgi</li>
                     <li>✅ SSL/HTTPS with Let's Encrypt</li>
                     <li>✅ Domain: thecied.dev</li>
                     <li>✅ Automatic deployment pipeline</li>
+                </ul>
+            </div>
+            <div class="info">
+                <h3>🔗 API Endpoints:</h3>
+                <ul>
+                    <li><a href="/api/" target="_blank">API Root</a> - Browse the API</li>
+                    <li><a href="/api/health/" target="_blank">Health Check</a> - API status</li>
+                    <li><a href="/admin/" target="_blank">Admin Panel</a> - Django admin</li>
                 </ul>
             </div>
             <div class="footer">
@@ -61,4 +70,5 @@ def home(request):
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
+    path('api/', include('api.urls')),
 ]
