@@ -1,0 +1,479 @@
+// Wait for the DOM to be fully loaded before adding the event listener
+document.addEventListener("DOMContentLoaded", function () {
+
+	document.addEventListener('show.bs.modal', (event) => {
+        // Add no-print to body
+        document.body.classList.add('unprintable');
+        // Add printable to the specific modal
+        const modal = event.target;
+
+		// Move modal to end of body
+        document.body.appendChild(modal);
+
+        modal.classList.add('printable');
+    });
+
+    document.addEventListener('hidden.bs.modal', (event) => {
+        // Remove no-print from body
+        document.body.classList.remove('unprintable');
+        // Remove printable from the specific modal
+        const modal = event.target;
+        modal.classList.remove('printable');
+    });
+
+
+
+    // Select all <textarea> elements on the page
+    const textareas = document.querySelectorAll("textarea");
+
+    // Loop through each <textarea> element
+    textareas.forEach(function (textarea) {
+        // Add the 'input' event listener to each <textarea>
+        textarea.addEventListener("input", function () {
+            // Replace smart quotes with straight quotes
+            this.value = this.value
+                .replace(/&ldquo;|&rdquo;/g, '"')  // Replace HTML entities for double quotes
+                .replace(/&lsquo;|&rsquo;/g, "'")  // Replace HTML entities for single quotes
+                .replace(/[\u2018\u2019]/g, "'")   // Replace Unicode curly single quotes
+                .replace(/[\u201C\u201D]/g, '"')  // Replace Unicode curly double quotes
+			// Fix encoding issues
+                .replace(/Â/g, '')                 // Remove the misinterpreted Â character
+                .replace(/â€™/g, "'")              // Convert â€™ to straight apostrophe
+                .replace(/â€œ/g, '"')              // Convert â€œ to left double quote
+                .replace(/â€/g, '"');             // Convert â€ to right double quote
+        });
+    });
+});
+
+
+printDetails = () => {
+	window.print();
+};
+
+emailCurrentPage = () => {
+	window.location.href =
+		"mailto:?subject=Check out " +
+		document.title +
+		"&body=I recommend that you check out: " +
+		escape(window.location.href);
+};
+
+isExternalLink = (url) => {
+    const tmp = document.createElement('a');
+    tmp.href = url;
+    return tmp.host !== window.location.host;
+};
+
+cleanLinks = (el) => {
+	el.each(function (){
+		if ( $(this).attr('href') ) {
+			if ( !isExternalLink($(this).attr('href')) ) {
+				$(this).attr('href', $(this).attr('href').replace('index.html', ''));
+			}
+		}
+	});
+};
+
+toggleSidebarMenu = () => {
+	// auto-close sidebar menu for small screens
+	if (window.matchMedia('(min-width: 768px)').matches) {
+		$("#sidebarNav").addClass("show");
+	} else {
+		$("#sidebarNav").removeClass("show");
+	}
+};
+
+toggleAllAccordions = () => {
+	// buttons to open/close all accordions
+	let openAll = $(".toggle-accordions-open");
+	let closeAll = $(".toggle-accordions-close");
+
+	openAll.on("click", function (){
+		let target = $(this).attr("data-target");
+		$("#" + target + " .accordion-item").children(".accordion-collapse").each(function (){
+			$(this).collapse("show");
+		});
+		$('.toggle-accordions-open[data-target="' + target + '"]').hide();
+		$('.toggle-accordions-close[data-target="' + target + '"]').show();
+	});
+	closeAll.on("click", function (){
+		let target = $(this).attr("data-target");
+		$("#" + target + " .accordion-item").children(".accordion-collapse").each(function (){
+			$(this).collapse("hide");
+		});
+		$('.toggle-accordions-close[data-target="' + target + '"]').hide();
+		$('.toggle-accordions-open[data-target="' + target + '"]').show();
+	});
+};
+
+$.fn.changeElementType = function( newType ){
+  var $this = this;
+  this.each( function( index ){
+    var atts = {};
+    $.each( this.attributes, function(){
+      atts[ this.name ] = this.value;
+    });
+    var $old = $(this);
+    var $new = $('<'+ newType +'/>', atts ).append( $old.contents() );
+    $old.replaceWith( $new );
+    $this[ index ] = $new[0];
+  });
+  return this;
+};
+
+$(function (){
+
+	if ($("#sidebarNav").length) {
+		toggleSidebarMenu();
+		// run on resize
+		$(window).resize(function (){
+			toggleSidebarMenu();
+		});
+	}
+
+	if ($(".toggle-accordions-open, .toggle-accordions-close").length) {
+
+		toggleAllAccordions();
+	}
+
+	// auto-focus on search input
+	let searchFocus = () => document.getElementById("search").focus();
+	// add to desktop search btn
+	let desktopSearchBtn = document.getElementById("searchButton");
+	if (!desktopSearchBtn) {
+		return;
+	} else {
+		desktopSearchBtn.addEventListener("click", () => {
+			setTimeout(searchFocus, 500);
+		});
+	}
+	// add to mobile search btn
+	let mobileSearchBtn = document.getElementById("searchButtonMobile");
+	if (!mobileSearchBtn) {
+		return;
+	} else {
+		mobileSearchBtn.addEventListener("click", () => {
+			setTimeout(searchFocus, 500);
+		});
+	}
+	// add to "skip to search" btn
+	let skipToSearchBtn = document.getElementById("searchButtonSkipTo");
+	if (!skipToSearchBtn) {
+		return;
+	} else {
+		skipToSearchBtn.addEventListener("click", () => {
+			setTimeout(searchFocus, 500);
+		});
+	}
+
+	// link directly to opened tabs
+	$(".nav-link").on("click", function (el){
+		el.preventDefault();
+		let openTab = el.target.dataset.bsTarget;
+		if (history.pushState) {
+			// add opened tab ID to browser history
+			history.pushState(null, null, openTab);
+		} else {
+			// add opened tab ID to URL
+			window.location.hash = openTab;
+		}
+	});
+
+	// scroll to tabs section and open tab
+	if ($("#nav-tab").length && window.location.hash) {
+		let selectedTab = window.location.hash;
+		let tabComponent = document.getElementById("nav-tab");
+		let tabButton = document.querySelector(
+			'.nav-link[data-bs-target="' + selectedTab + '"]'
+		);
+		// scroll to tabs section
+		tabComponent.scrollIntoView();
+		// click tab to display contents
+		tabButton.click();
+	}
+
+	// bind a click event to the 'skip' link
+	$(".skip").click(function (event){
+		// strip the leading hash and declare
+		// the content we're skipping to
+		var skipTo = "#" + this.href.split("#")[1];
+
+		// Setting 'tabindex' to -1 takes an element out of normal
+		// tab flow but allows it to be focused via javascript
+		$(skipTo).attr("tabindex", -1).on("blur focusout", function (){
+			// when focus leaves this element,
+			// remove the tabindex attribute
+			$(this).removeAttr("tabindex");
+		}).focus(); // focus on the content container
+	});
+
+	//// add scroll button ////
+	// create scroll button link element
+	let scrollBtn = document.createElement("a");
+	scrollBtn.id = "scrollToTop";
+	//scroll button links to #top id
+	scrollBtn.href = "#top";
+	scrollBtn.title = "Back to top of the page";
+	scrollBtn.className = "cd-top no-print";
+	scrollBtn.innerHTML =
+		'<span class="fa fa-chevron-up" aria-hidden="true"></span><span class="cd-top-label">Top</span>';
+	// add scroll button to body
+	document.body.appendChild(scrollBtn);
+
+	// handle scroll top top button visiblity and click event
+	let a = 1200, // show after 1200px
+		e = 1800, //
+		o = 500, // scrollspeed in ms
+		i = $(".cd-top");
+	$(window).scroll(function (){
+		$(this).scrollTop() > a
+			? i.addClass("cd-is-visible")
+			: i.removeClass("cd-is-visible cd-fade-out"),
+		$(this).scrollTop() > e && i.addClass("cd-fade-out");
+	}),
+		i.on("click", function (a){
+			a.preventDefault(), $("body,html").animate({scrollTop: 0}, o);
+		});
+});
+
+$(document).ready(function (){
+	cleanLinks( $('#nav-sidebar a, #main-nav a, #main a') );
+
+	// Rich Text Editor
+	$('img').filter(function (){
+		return $(this).css('float') == 'left'
+	}).addClass("img-float img-float-left");
+	$('img').filter(function (){
+		return $(this).css('float') == 'right'
+	}).addClass("img-float img-float-right");
+
+	// add subnav class to sidebar items
+	$('#nav-sidebar li:has(>ul)').addClass('subnav').each(function(){
+		let subNavCont = $('<div class="d-flex justify-content-between align-items-center gap-1"/>');
+		const subNavLink = $(this).find('>a');
+		const subNavSlug = subNavLink.text().toLowerCase().replace(/ /g,'-').replace(/[-]+/g, '-').replace(/[^\w-]+/g,'');
+		$(subNavCont).append(subNavLink);
+		$(subNavCont).append('<button aria-label="Toggle Subnav" data-subnav-id="subnav-'+subNavSlug+'" class="subnav-toggle btn btn-sm m-0"><i class="fa-solid fa-caret-down"><i/></button>');
+		$(this).prepend(subNavCont);
+	});
+	$('.subnav-toggle').click(function () {
+		$(this).closest('.subnav').toggleClass('open');
+		$(this).find('.fa-caret-down').toggleClass('flip-vertically');
+	});
+
+	// add big link to bottom of main nav
+	if (window.matchMedia('(min-width: 992px)').matches) {
+		$('#main-nav .nav-dropdown-div.dropdown').each(function (){
+			const mainNavDropLink = $(this).find('.dropdown-toggle').attr('href');
+			const mainNavDropText = $(this).find('.dropdown-toggle').text();
+			$(this).find('.dropdown-menu').append( $(`<a class="btn btn-gold d-flex justify-content-between align-items-center gap-1" href="${mainNavDropLink}">${mainNavDropText} Overview<i class="fa-duotone fa-solid fa-right"></i></a>`))
+		});
+	}
+
+	// add active link to sidebar
+	$('#nav-sidebar a').each(function (){
+		if ($(this).attr('href') == window.location.pathname) {
+			$(this).closest('li').addClass('active');
+			$(this).parents().each(function(){
+				if( $(this).hasClass('subnav') ) {
+					$(this).addClass('open');
+				}
+			});
+		}
+	})
+
+	// add external link class to sidebar links
+	const currentDomain = document.location.protocol + '//' + document.location.hostname
+	$('#nav-sidebar a[href^="http"]:not([href*="' + currentDomain + '"])').addClass('external-link')
+
+	// Remove extraneous heading tags
+	$('.card-contact .card-title, .card-contact .card-subtitle').each(function (){
+		if( !$(this).text() ) {
+			$(this).remove();
+		}
+	});
+	// add link to contact cards
+	$('.card-contact a.list-group-item').each(function (){
+		if ($(this).hasClass('content-envelope')) {
+			$(this).attr('href', 'mailto:' + $.trim($(this).text()));
+		}
+		if ($(this).hasClass('content-phone-volume')) {
+			$(this).attr('href', 'tel:' + $(this).text().replace(/[^\d\+]+/g, '').replace(/(.)\++/g, "$1"));
+		}
+		if ($(this).hasClass('content-book-user')) {
+			$(this).attr('href', 'tel:' + $(this).text().replace(/[^\d\+]+/g, '').replace(/(.)\++/g, "$1"));
+		}
+	});
+
+	let menuItems = document.querySelectorAll("li.has-submenu");
+	Array.prototype.forEach.call(menuItems, function (el, i){
+		el.querySelector("a").addEventListener("click", function (event){
+			if (this.parentNode.className == "has-submenu") {
+				this.parentNode.className = "has-submenu open";
+				this.setAttribute("aria-expanded", "true");
+			} else {
+				this.parentNode.className = "has-submenu";
+				this.setAttribute("aria-expanded", "false");
+			}
+			event.preventDefault();
+			return false;
+		});
+	});
+
+	// Masking (for Phone # and SF ID #)
+	$(".mask-tel").mask("999-999-9999");
+	$(".mask-sfid").mask("9999-9999");
+
+	// Forms section
+	$('input[type="hidden"][name="redirect"]').val(window.location.href + '?success');
+
+	let searchParams = new URLSearchParams(window.location.search);
+
+	if (searchParams.has('success')) {
+		if ($('#form-thank-you').length) {
+			console.log('with thanks');
+			$('.form-hider').hide();
+			$('#form-thank-you').removeClass('d-none');
+			$('html').animate({
+				scrollTop: $("#form-thank-you").offset().top
+			}, 800);
+		} else {
+			console.log('no thanks');
+			$('.form-hider')
+				.before('<div id="form-thank-you" class="alert alert-success"><h3 class="alert-heading">Submission successful!</h3><p>Thank you for your submission. We will review your information and reply shortly.</p></div>')
+				.hide();
+			$('html').animate({
+				scrollTop: $('#form-thank-you').offset().top
+			}, 800);
+		}
+	}
+
+	// Contact Cards
+	$('.card-contact .advisement-tracks').each(function(){
+		const tracks = $(this).text().split(';');
+		const currentTrack = $(this).empty();
+		$.each( tracks, function( i, val ) {
+			currentTrack.append('<div class="badge text-body border border-primary">' + val + '</div>');
+		});
+	});
+
+	$('.card-contact.advisement').each(function(){
+		const firstName = $(this).attr('data-name-first');
+		const lastName = $(this).attr('data-name-last');
+		const title = $(this).attr('data-title');
+		$(this).find('.list-group-item').each(function(){
+			const content = $(this).find('span');
+			const contentText = content.text().trim();
+			if ($(this).hasClass('content-calendar-check')) {
+				content.replaceWith(`<a href="${contentText}">Schedule an appointment with ${firstName}</a>`);
+			}
+		});
+	});
+
+	if ( $('.card-contact .list-group-item.content-book-user') ) {
+		const bioModal = $.parseHTML(`<div class="modal fade" id="bioModal" tabindex="-1" aria-labelledby="bioModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h1 class="modal-title fs-5" id="bioModalLabel">Biography</h1><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"></div></div></div></div>`);
+		$('body').append(bioModal);
+	}
+
+	$('.card-contact .list-group-item').each(function (){
+		let firstName = $(this).parents('.card-contact').attr('data-first-name');
+		if (firstName) {
+			if (firstName.slice(-1) === 's') {
+				firstName += "'";
+			} else {
+				firstName += "'s";
+			}
+		}
+		const content = $(this).find('span');
+		const contentText = content.text().trim();
+
+		if ($(this).hasClass('content-book-user')) {
+			if(firstName) {
+				content.replaceWith(`<u>${firstName} Biography</u>`);
+				$(this).changeElementType('a').attr({href: '#', 'data-bs-toggle': `modal`, 'data-bs-target': `#bioModal`, 'data-bs-bio': contentText, 'aria-label': `${firstName} Biography`});
+			} else {
+				content.replaceWith(`<u>Biography</u>`);
+				$(this).changeElementType('a').attr({href: '#', 'data-bs-toggle': `modal`, 'data-bs-target': `#bioModal`, 'data-bs-bio': contentText, 'aria-label': `Biography`});
+			}
+			if ( $('#bioModal') ) {
+				bioModal.addEventListener('show.bs.modal', event => {
+					const button = event.relatedTarget;
+					const title = button.getAttribute('aria-label');
+					const biography = button.getAttribute('data-bs-bio');
+					const modalTitle = bioModal.querySelector('.modal-title');
+					const modalBody = bioModal.querySelector('.modal-body');
+					modalTitle.textContent = title;
+					$(modalBody).html( $.parseHTML(`<p>${biography}</p>`) );
+				})
+			}
+		}
+		if ($(this).hasClass('content-user')) {
+			if(firstName) {
+				content.replaceWith(`<u>${firstName} Profile Page</u>`);
+				$(this).changeElementType('a').attr({href: contentText, ariaLabel: `${firstName} Profile Page`});
+			} else {
+				content.replaceWith(`<u>Profile Page</u>`);
+				$(this).changeElementType('a').attr({href: contentText, ariaLabel: `Profile Page`});
+			}
+		}
+// 		if ($(this).hasClass('content-inbox-out')) {
+		if ($(this).hasClass('content-paper-plane')) {
+
+			content.replaceWith(`<u>${contentText}</u>`);
+			$(this).changeElementType('a').attr({href: 'mailto:' + contentText});
+		}
+// 		if ($(this).hasClass('content-phone-arrow-right')) {
+		if ($(this).hasClass('content-phone')) {
+			content.replaceWith(`<u>${contentText}</u>`);
+			$(this).changeElementType('a').attr({href: 'tel:+1' + contentText});
+		}
+		if ($(this).hasClass('content-link')) {
+			content.replaceWith(`<u>${contentText}</u>`);
+			$(this).changeElementType('a').attr({href: contentText});
+		}
+	});
+
+	// list group file links - internal
+	$('.list-group a.list-group-item-action').each(function(){
+		if ( $(this).hasClass('pdf') ) {
+			$(this).prepend('<span class="fa-duotone fa-file-pdf" aria-hidden="true"></span>&nbsp;');
+		} else if ( $(this).hasClass('word') ) {
+			$(this).prepend('<span class="fa-duotone fa-file-doc" aria-hidden="true"></span>&nbsp;');
+		} else if ( $(this).attr('href').startsWith('#') ) {
+			$(this).prepend('<svg class="fa-svg" style="width:1.75rem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Pro 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2024 Fonticons, Inc.--><path class="fa-secondary" fill="currentColor" opacity=".4" d="M0 352c0 17.7 14.3 32 32 32l58.2 0-9.6 58.9c-2.9 17.4 8.9 33.9 26.3 36.8s33.9-8.9 36.8-26.3l11.5-69.3 95.1 0-9.8 58.7c-2.9 17.4 8.9 33.9 26.3 36.8s33.9-8.9 36.8-26.3L315.1 384l5.6 0c-.5-5.3-.7-10.6-.7-16c0-16.6 2.3-32.7 6.6-48l-.8 0 21.3-128 68.9 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-58.2 0 9.7-58.8c2.9-17.4-8.9-33.9-26.3-36.8s-33.9 8.9-36.8 26.3L292.9 128l-95.1 0 9.8-58.8c2.9-17.4-8.9-33.9-26.3-36.8l-.1 0c-17.4-2.9-33.9 8.9-36.8 26.3L132.9 128 64 128c-17.7 0-32 14.3-32 32s14.3 32 32 32l58.2 0L100.9 320 32 320c-17.7 0-32 14.3-32 32zm165.8-32l21.3-128 95.1 0L260.9 320l-95.1 0z"/><path class="fa-primary" fill="currentColor" d="M352 368c0 51.4 27.4 99 72 124.7s99.4 25.7 144 0s72-73.3 72-124.7s-27.4-99-72-124.7s-99.4-25.7-144 0S352 316.6 352 368zm211.3 19.3l-56 56c-6.2 6.3-16.4 6.3-22.6 0l-56-56c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L480 393.4l0-89.4c0-8.8 7.2-16 16-16s16 7.2 16 16l0 89.4 28.7-28.7c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"/></svg>&nbsp;');
+		} else if ( $(this).attr('target') === '_blank' ) {
+			$(this).prepend('<span class="fa-duotone fa-up-right-from-square" aria-hidden="true"></span>&nbsp;');
+		} else {
+			$(this).prepend('<span class="fa-duotone fa-right-from-bracket" aria-hidden="true"></span>&nbsp;');
+		}
+	});
+
+	// External Links
+	$('a[target="_BLANK"], a[target="_blank"]').each(function (){
+		if ($(this).children().length > 0) {
+			$(this).children().each(function (){
+				if ($(this).hasClass('text')) {
+					$(this).append('<span class="fa-duotone fa-up-right-from-square" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>');
+				}
+			});
+		} else {
+			if ($(this).hasClass('list-group-item')) {
+				if ( $(this).hasClass('pdf') ) {
+					$(this).prepend('<span class="fa-duotone fa-file-pdf" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>&nbsp;');
+				} else if ( $(this).hasClass('word') ) {
+					$(this).prepend('<span class="fa-duotone fa-file-doc" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>&nbsp;');
+				} else {
+					$(this).prepend('<span class="fa-duotone fa-up-right-from-square" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>&nbsp;');
+				}
+			} else {
+				if ( $(this).hasClass('pdf') ) {
+					$(this).append('&nbsp;<span class="fa-duotone fa-file-pdf" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>');
+				} else if ( $(this).hasClass('word') ) {
+					$(this).append('&nbsp;<span class="fa-duotone fa-file-doc" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>');
+				} else {
+					$(this).append('<span class="fa-duotone fa-up-right-from-square" aria-hidden="true"></span><span class="sr-only">(Opens in new window)</span>');
+				}
+			}
+		}
+	});
+});

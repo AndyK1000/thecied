@@ -1,0 +1,51 @@
+$(document).ready(function(){
+
+	const getStoredTheme = () => localStorage.getItem('theme')
+	const setStoredTheme = theme => localStorage.setItem('theme', theme)
+
+	const getPreferredTheme = () => {
+		const storedTheme = getStoredTheme()
+		if (storedTheme) {
+			return storedTheme
+		}
+		return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+	}
+
+	const setTheme = theme => {
+		if (!theme) {
+			$('html').attr('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+		} else {
+			$('html').attr('data-bs-theme', theme)
+		}
+	}
+
+	setTheme(getPreferredTheme())
+
+	const showActiveTheme = (theme) => {
+		$('[data-bs-theme-value]').addClass('d-none')
+		$('[data-bs-theme-value]').each(function(){
+			if($(this).attr('data-bs-theme-value') !== theme) {
+				$(this).removeClass('d-none')
+			}
+		})
+	}
+
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+		const storedTheme = getStoredTheme()
+		if (storedTheme !== 'light' && storedTheme !== 'dark') {
+			showActiveTheme(getPreferredTheme())
+			setTheme(getPreferredTheme())
+		}
+	})
+	
+	showActiveTheme(getPreferredTheme())
+	
+	$('[data-bs-theme-value]').on('click', function(){
+		const theme = $(this).attr('data-bs-theme-value')
+		$('[data-bs-theme-value]').removeClass('d-none')
+		$('[data-bs-theme-value=' + theme +']').addClass('d-none')
+		setStoredTheme(theme)
+		setTheme(theme)
+	})
+})
+

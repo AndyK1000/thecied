@@ -17,8 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
+from django.shortcuts import render
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.static import serve
+import os
 
-def home(request):
+def react_app(request):
+    """Serve the React application"""
+    return render(request, 'index.html')
+
+def legacy_home(request):
+    """Legacy home page for reference"""
     return HttpResponse("""
     <!DOCTYPE html>
     <html>
@@ -44,7 +54,7 @@ def home(request):
                 <h3>🚀 What's Working:</h3>
                 <ul>
                     <li>✅ Django 5.2.4 running on Python 3.12</li>
-                    <li>✅ Django REST Framework API</li>
+                    <li>✅ Django Events System</li>
                     <li>✅ Apache web server with mod_wsgi</li>
                     <li>✅ SSL/HTTPS with Let's Encrypt</li>
                     <li>✅ Domain: thecied.dev</li>
@@ -52,10 +62,9 @@ def home(request):
                 </ul>
             </div>
             <div class="info">
-                <h3>🔗 API Endpoints:</h3>
+                <h3>🔗 Available Pages:</h3>
                 <ul>
-                    <li><a href="/api/" target="_blank">API Root</a> - Browse the API</li>
-                    <li><a href="/api/health/" target="_blank">Health Check</a> - API status</li>
+                    <li><a href="/events/" target="_blank">Events</a> - View upcoming events</li>
                     <li><a href="/admin/" target="_blank">Admin Panel</a> - Django admin</li>
                 </ul>
             </div>
@@ -68,7 +77,18 @@ def home(request):
     """)
 
 urlpatterns = [
-    path('', home, name='home'),
+    path('', react_app, name='home'),
+    path('legacy/', legacy_home, name='legacy_home'),  # Keep old home for reference
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('events/', include('events.urls')),
+    # Serve images at /images/ for React app compatibility
+    path('images/<path:path>', serve, {
+        'document_root': os.path.join(settings.STATIC_ROOT, 'images')
+    }),
 ]
+
+# Serve static files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

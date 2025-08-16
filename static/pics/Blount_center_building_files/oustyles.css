@@ -1,0 +1,101 @@
+/*
+Implementation Skeleton v3 - 12/6/18
+Add styles to overwrite customer CSS, USE WITH CAUTION.
+*/
+
+#directedit {
+	right: 0;
+	position: fixed;
+	bottom: 0;
+}
+
+#directedit a {
+	text-decoration: none;
+}
+
+/* UAT 210781 */
+#de {
+	display: block;
+	width: 30px;
+	height: 30px;
+}
+
+.ou-justedit-region table tbody tr:last-child td{
+	padding-bottom: 30px;
+}
+
+/* make sure for inputs are square */
+.form-group input[type='text'], .form-group select, .form-group textarea{
+	border-radius: 0 !important;
+}
+
+/* remove bottom margin if py-4 class is added */
+.ou-form .form-group.py-4 {
+	margin-bottom: 0px;
+}
+
+/* override default form btn styling */
+.ou-form .btn{
+	border-radius: 0px !important;
+	padding: 12px 25px !important;
+	font-weight: bold !important;
+	font-size: inherit !important;
+}
+
+/* override other form styling */
+.ou-form label {
+	margin-bottom: 0px !important;
+}
+
+.form-check label {
+	font-weight: inherit !important;
+}
+
+.ou-form .form-check {
+	padding-left: 0px !important;
+}
+
+label.form-check-label {
+    padding-left: 8px;
+}
+
+.ou-form .form-control{
+	font-size: inherit !important;
+}
+
+.bg-med-dark-gray {
+	background: var(--gray-med-dark) !important;
+}
+
+
+/* UAT 208107 */
+.bg-secondary-alt a:not(.btn) { color: var(--primary-alt); }
+
+
+/* UAT 210313 - Prevent forms from printing */
+@media print {
+  .ou-form-container {
+    display: none;
+  }
+	
+  .ou-form {
+    display: none;
+  }
+}
+
+
+/* UAT 210066 */
+/*.card .card-body .btn{*/
+/*  margin: .25em;*/
+/*}*/
+
+/* UAT 212187 */
+.block-icon {
+  font-size: 1.5em;
+  color: var(--white);
+  background-color: var(--blue-med);
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.5em;
+  margin-right: 0.25em;
+}

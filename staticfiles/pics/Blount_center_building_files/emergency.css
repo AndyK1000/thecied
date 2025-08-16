@@ -1,0 +1,107 @@
+/* To update this file, upload to CM1 first */
+ 
+.alertBlock {
+    display: block;
+    padding: 0 10px;
+}
+.emergency-form {
+    margin-top: 25px;
+}
+/*.theme-emergency, .theme-notice, .theme-web {
+    text-align: center;
+    font-size: 18px;
+    font-family: sans-serif;
+}*/
+/* Updated this for eSantaFe */
+.theme-emergency p, .theme-notice p, .theme-web p, .theme-style p {
+    /*word-break: break-all;*/
+    word-wrap: break-word;
+    font-family: sans-serif;
+    font-size: 18px;
+    text-align: center;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+}
+.theme-emergency a, .theme-notice a, .theme-web a, .theme-style a {
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    border-bottom-style: solid;
+    border-width: 3px;
+}
+.theme-emergency {
+    background: #b20000;
+    color: #fff;
+    border: 6px solid #f64b2f;
+}
+ 
+.theme-emergency p {
+    color: #fff;
+}
+ 
+.theme-emergency a {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+.theme-emergency a:hover, .theme-emergency a:focus {}
+.theme-notice {
+    background: #f6ca2f;
+    color: #6c4c00;
+    border: 6px solid #dca81c;
+}
+.theme-notice a {
+    color: #000 !important;
+    border-color: #6c4c00 !important;
+}
+.theme-notice p {
+    color: #000;
+}
+.theme-notice a:hover, .theme-notice a:focus {
+    border-bottom-color: #000;
+}
+.theme-notice a:focus {
+    background: #dca81c;
+}
+.theme-web {
+    background: #88ceff;
+    color: #000;
+    border: 6px solid #0b72bd;
+}
+.theme-web p {
+    color: #000;
+}
+.theme-web a {
+    color: #000 !important;
+}
+.theme-web span {
+    color: #dbdbdb;
+}
+.theme-web a:focus {
+    background: #0b72bd;
+}
+ 
+/* Custom Color Theme */
+.theme-style {
+    background: #88ceff;
+    color: #000;
+    border: 6px solid #0b72bd;
+}
+.theme-style a {
+    color: #000;
+}
+.theme-style span {
+    color: #dbdbdb;
+}
+.theme-style a:focus {
+    background: #0b72bd;
+}
+ 
+ 
+/* Font Awesome for link */
+.theme-emergency a:after, .theme-notice a:after .theme-web a:after, .theme-style a:after {
+    content: '\f178';
+    font-family: "FontAwesome";
+    margin-left: 5px;
+    display: inline-block;
+}

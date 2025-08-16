@@ -1,0 +1,336 @@
+.mceNonEditable-hide-msg:before, .mceNonEditable-hide-msg::before {
+	content: "" !important;
+	display: none !important;
+}
+
+.simple-list-group.list-group .list-group-item:before, .simple-list-group.list-group .list-group-item [class*="fa-"], .simple-list-group.list-group .list-group-item [data-fa-pseudo-element="::before"] {
+    padding-right: 0;
+}
+
+.border-orange {
+	--bs-border-opacity: 1;
+	border-color: #fd7e14 !important;
+}
+
+.text-bg-orange {
+	color: #000 !important;
+	background-color: #fd7e14 !important;
+}
+
+.text-orange {
+	--bs-text-opacity: 1;
+	color: #fd7e14 !important;
+}
+
+.svg-light, 
+.svg-dark {display:none !important;}
+
+[data-bs-theme="light"] .svg-light,
+[data-bs-theme="dark"] .svg-dark {
+  display: inline !important;
+}
+
+/* IMG Global */
+@media only screen and (max-width: 576px) {
+	.img-float {
+		float: none !important;
+		margin: 0 auto !important;
+		padding: 0 !important;
+		margin-bottom: 15px !important;
+		width: 100%;
+	}
+}
+
+.table-fixed {
+	table-layout: fixed !important;
+}
+
+@media only screen and (max-width: 768px) {
+	.table-fixed {
+		table-layout: auto !important;
+	}
+}
+
+/* subnav */
+.subnav-toggle.btn {
+	min-height: auto;
+}
+
+/* Apple Maps Link for Contact Department Card component */
+.google-maps-link::before, 
+.apple-maps-link::before,
+.direction-maps-icon::before{
+	margin-inline-end: .25em;
+	display: inline-block;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	font: var(--fa-font-brands);
+	/* 	font-size: .75em; */
+}
+
+.apple-maps-link::before {
+	content: "\f179";
+}
+
+.google-maps-link::before {
+	content: "\f1a0";
+}
+
+.direction-maps-icon::before {
+	font: var(--fa-font-solid);
+	content: "\f276";
+}
+
+
+/* Blocquote Updated Contrast per Siteimprove */
+.blockquote-footer {
+	color: var(--black);
+}
+
+/* btn-full override */
+.btn.btn-full {
+	display: flex !important;
+}
+
+/* btn pseudo override */
+/* .list-group .list-group-item:before, .list-group .list-group-item [class*="fa-"], .list-group .list-group-item [data-fa-pseudo-element="::before"] {} */
+
+/* 404 */
+.error-404 a {
+	color: var(--white);
+}
+.error-404 img {
+	filter: drop-shadow(15px 15px 0 #036);
+}
+
+/* Dark mode for card-footer bg-light */
+[data-bs-theme=dark] .bg-light {
+	--bs-bg-opacity: 0;
+	background-color: rgba(var(--bs-dark-rgb),var(--bs-bg-opacity)) !important;
+}
+
+[data-bs-theme=dark] .text-bg-light {
+	--bs-bg-opacity: 0;
+	background-color: rgba(var(--bs-dark-rgb),var(--bs-bg-opacity)) !important;
+	color: var(--bs-white) !important;	
+}
+
+
+/* MC Search Engine - Best Bet */
+.ou-search-row {}
+
+.ou-bestbets {
+	background: var(--bs-warning-bg-subtle) !important;
+	border: 3px solid var(--bs-warning-border-subtle) !important;
+	padding: 0 !important;
+}
+
+.ou-bestbets .ou-search-list .ou-search-list-li {
+	/* 	padding-bottom: 0 !important; */
+	border-bottom: 3px solid var(--bs-warning-border-subtle) !important;
+}
+
+.ou-bestbets .ou-search-list .ou-search-list-li:last-child {
+	border-bottom: none !important;
+}
+
+
+[data-bs-theme=dark] .degree-bubble.as-degree {background: var(--blue-md-light-alt); color: var(--black)}
+
+
+#sidebarAccordion .accordion-button::before, #sidebarAccordion .accordion-button [data-fa-pseudo-element="::before"] {
+	content: "\f141";
+}
+
+/* Make search content 100% width that is consistent with other pages */
+.ou-search-container {width: 100% !important;}
+
+/* News */
+.more-link:after {
+	display: inline-block;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	font: var(--fa-font-solid);
+	content: "\f061";
+	font-size: 75%;
+	/* 	color: var(--gold); */
+	margin: 0 .5rem;
+	text-decoration: none;
+	float: none;
+	padding-right: initial;
+}
+
+[data-bs-theme=light] .card-details {
+	border: 1px transparent solid !important;
+
+}
+
+[data-bs-theme=dark] .card-details {
+	background: transparent !important;
+}
+
+[data-bs-theme=dark] .text-dark {
+	color: inherit !important;
+}
+
+.card-details img {
+	object-position: center center !important;
+	transition: transform .25s;
+}
+
+a:hover img.card-img-top.object-fit-cover, a:focus img.card-img-top.object-fit-cover {
+	transform: scale(1.1);
+}
+
+.hero-news {
+	background: var(--bs-secondary-bg) !important;
+	background-color: var(--bs-secondary-bg) !important;
+	/* 	background: #f8f9fa !important;
+	background-color: #f8f9fa !important; */
+	/* 	color: var(--bs-dark); */
+}
+
+.hero-news h1, .hero-news p, .hero-news .breadcrumb, .hero-news .breadcrumb a, .hero-news .breadcumb .breadcrumb-item, .hero-news .breadcrumb *, .hero-news .breadcrumb-item + .breadcrumb-item::before {
+	text-shadow: none !important;
+	color: var(--bs-dark);
+}
+
+[data-bs-theme=dark] .hero-news h1,
+[data-bs-theme=dark] .hero-news p,
+[data-bs-theme=dark] .hero-news .breadcrumb,
+[data-bs-theme=dark] .hero-news .breadcrumb a,
+[data-bs-theme=dark] .hero-news .breadcumb .breadcrumb-item,
+[data-bs-theme=dark] .hero-news .breadcrumb *,
+[data-bs-theme=dark] .hero-news .breadcrumb-item + .breadcrumb-item::before {
+	color: var(--bs-white);	
+}
+
+/* .list-group-news.list-group a.list-group-item [class*="fa-"],
+.list-group-events.list-group a.list-group-item [class*="fa-"] {display: none;} */
+
+@media only screen and (max-width: 950px) {
+	.list-group-events a {
+		display: block !important;
+	} 
+	.list-group-events .badge {
+		display: inline-block !important;
+		float: none !important;
+		margin-top: 5px;
+	}
+}
+
+.card.card-news-alert {
+	--bs-card-cap-bg: var(--bs-danger-bg-subtle);
+	--bs-card-cap-color: var(--bs-danger-text-emphasis);
+	--bs-card-border-color: var(--bs-danger-border-subtle);
+	--bs-card-cap-highlight: var(--bs-body-color);
+}
+
+
+/* [data-bs-theme=dark] .hero-news h1 img {
+background-color: var(--bs-white);
+-webkit-mask: url(/_resources/images/newsfeed-logo.svg) no-repeat center;
+mask: url(/_resources/images/newsfeed-logo.svg) no-repeat center;
+} */
+
+
+/* background: var(--bs-tertiary-bg);
+background: var(--bs-tertiary-bg);
+color: var(--bs-body-color);
+border: 1px solid var(--bs-primary);
+border-top: 5px solid var(--bs-primary);
+box-shadow: none;
+} */
+
+
+/* @media only screen and (max-width: 576px) {
+[data-bs-theme=dark] .controls .filter-group {
+background: var(--bs-tertiary-bg) !important;
+color: var(--bs-body-color) !important;
+}
+} */
+
+
+/* Contrast */
+[data-bs-theme=light] .pagination-custom .disabled>.page-link, .page-link.disabled {
+	color: var(--black);
+}
+
+/* Overriding the other class */
+.pagination-custom .page-item:first-child .page-link {
+	background: transparent !important;
+}
+
+
+/* Modal Search Quick Links */
+.modal-search-quick-links a,
+.modal-search-top-queries a {
+	color: var(--black);
+}
+
+[data-bs-theme=dark] .modal-search-quick-links a,
+[data-bs-theme=dark] .modal-search-top-queries a {
+	color: var(--white);
+}
+
+/* List Group Events and News */
+.list-group a.list-group-item:not(.external-link):before {display: none !important;}
+
+.list-group-events .badge-event-location,
+.list-group-news .badge-news-date {
+	background: var(--gray-med-dark);
+	color: var(--bs-body-color);
+	border: 1px solid var(--gray-med-dark);
+}
+
+
+[data-bs-theme=dark] .list-group-events .badge-event-location,
+[data-bs-theme=dark] .list-group-news .badge-news-date{
+	background: rgba(var(--gray-med-dark-rgb), 10%);
+	border-color: var(--gray-med-dark);
+	color: var(--gray-med-dark);
+}
+
+/* Download Icon */
+a[download]:after {
+	display: inline-block;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	font: var(--fa-font-solid);
+	color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
+	content: "\f019";
+	margin-left: 5px;
+}
+
+[data-bs-theme=dark] .text-bg-light {
+	background-color: transparent;
+	color: var(--bs-body-color);
+}
+
+/* Pagination Contrast Issue */
+.active>.page-link, .page-link.active {
+	color: var(--black);
+	background-color: var(--gold);
+}
+
+/* Areas of Interest */
+.aos .feature-icon {
+	width: 4rem;
+	height: 4rem;
+	border-radius: .75rem;
+	background: var(--blue);
+	color: var(--white);
+}
+
+[data-bs-theme=dark] .aos .feature-icon-special, .aos .feature-icon-special {
+	background: var(--bs-tertiary-color) !important;
+}
+
+.aos .card:hover {
+	background: var(--bs-secondary-bg);
+}
+
+[data-bs-theme=dark] .aos .feature-icon {
+	background: var(--gold);
+	color: var(--black);
+}
