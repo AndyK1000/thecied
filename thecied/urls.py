@@ -27,7 +27,7 @@ def react_app(request):
     """Serve the React application"""
     # Check if this is admin subdomain
     host = request.get_host()
-    if host.startswith('admin.'):
+    if host.startswith('admin.') or 'admin.' in host:
         return redirect('/admin_dashboard/')
     return render(request, 'index.html')
 
