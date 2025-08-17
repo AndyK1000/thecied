@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The CIED - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="admin-dashboard-root">
+        <div class="min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <div class="loading mb-4"></div>
+                <p class="text-gray-600">Loading Admin Dashboard...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin Dashboard React App
+        const AdminDashboard = () => {
+            const [user, setUser] = React.useState(null);
+            const [stats, setStats] = React.useState(null);
+            const [reservations, setReservations] = React.useState([]);
+            const [venues, setVenues] = React.useState([]);
+            const [suites, setSuites] = React.useState([]);
+            const [entities, setEntities] = React.useState({ individuals: [], organizations: [] });
+            const [activeTab, setActiveTab] = React.useState('overview');
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState(null);
+
+            React.useEffect(() => {
+                // Fetch user info and data
+                fetchData();
+            }, []);
+
+            const fetchData = async () => {
+                try {
+                    setLoading(true);
+                    const [statsRes, reservationsRes, venuesRes, suitesRes, entitiesRes] = await Promise.all([
+                        fetch('/admin_dashboard/api/stats/'),
+                        fetch('/admin_dashboard/api/reservations/'),
+                        fetch('/admin_dashboard/api/venues/'),
+                        fetch('/admin_dashboard/api/suites/'),
+                        fetch('/admin_dashboard/api/entities/')
+                    ]);
+
+                    if (statsRes.ok) setStats(await statsRes.json());
+                    if (reservationsRes.ok) setReservations((await reservationsRes.json()).reservations);
+                    if (venuesRes.ok) setVenues((await venuesRes.json()).venues);
+                    if (suitesRes.ok) setSuites((await suitesRes.json()).suites);
+                    if (entitiesRes.ok) setEntities(await entitiesRes.json());
+
+                    setLoading(false);
+                } catch (err) {
+                    setError(err.message);
+                    setLoading(false);
+                }
+            };
+
+            const updateReservationStatus = async (reservationId, status) => {
+                try {
+                    const response = await fetch('/admin_dashboard/api/reservation/status/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
+                        },
+                        body: JSON.stringify({ reservation_id: reservationId, status })
+                    });
+
+                    if (response.ok) {
+                        fetchData(); // Refresh data
+                        alert('Status updated successfully!');
+                    } else {
+                        alert('Failed to update status');
+                    }
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                }
+            };
+
+            const getCSRFToken = () => {
+                return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+            };
+
+            const logout = () => {
+                window.location.href = '/admin_dashboard/logout/';
+            };
+
+            if (loading) {
+                return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
+                    React.createElement('div', { className: 'text-center' },
+                        React.createElement('div', { className: 'loading mb-4' }),
+                        React.createElement('p', { className: 'text-gray-600' }, 'Loading Dashboard...')
+                    )
+                );
+            }
+
+            if (error) {
+                return React.createElement('div', { className: 'min-h-screen flex items-center justify-center' },
+                    React.createElement('div', { className: 'text-center text-red-600' },
+                        React.createElement('p', null, 'Error: ' + error)
+                    )
+                );
+            }
+
+            return React.createElement('div', { className: 'min-h-screen bg-gray-100' },
+                // Header
+                React.createElement('header', { className: 'bg-white shadow-sm border-b border-gray-200' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' },
+                        React.createElement('div', { className: 'flex justify-between items-center py-6' },
+                            React.createElement('div', { className: 'flex items-center' },
+                                React.createElement('h1', { className: 'text-2xl font-bold text-gray-900' }, 'The CIED Admin Dashboard'),
+                                React.createElement('span', { className: 'ml-4 px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full' }, 'Administrator')
+                            ),
+                            React.createElement('button', { 
+                                onClick: logout,
+                                className: 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150'
+                            }, 'Sign Out')
+                        )
+                    )
+                ),
+
+                // Navigation tabs
+                React.createElement('nav', { className: 'bg-white shadow-sm' },
+                    React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8' },
+                        React.createElement('div', { className: 'flex space-x-8' },
+                            ['overview', 'reservations', 'venues', 'suites', 'entities'].map(tab =>
+                                React.createElement('button', {
+                                    key: tab,
+                                    onClick: () => setActiveTab(tab),
+                                    className: `py-4 px-1 border-b-2 font-medium text-sm capitalize ${
+                                        activeTab === tab 
+                                            ? 'border-indigo-500 text-indigo-600' 
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`
+                                }, tab)
+                            )
+                        )
+                    )
+                ),
+
+                // Main content
+                React.createElement('main', { className: 'max-w-7xl mx-auto py-6 sm:px-6 lg:px-8' },
+                    activeTab === 'overview' && React.createElement(OverviewTab, { stats }),
+                    activeTab === 'reservations' && React.createElement(ReservationsTab, { reservations, updateReservationStatus }),
+                    activeTab === 'venues' && React.createElement(VenuesTab, { venues }),
+                    activeTab === 'suites' && React.createElement(SuitesTab, { suites }),
+                    activeTab === 'entities' && React.createElement(EntitiesTab, { entities })
+                )
+            );
+        };
+
+        // Overview Tab Component
+        const OverviewTab = ({ stats }) => {
+            if (!stats) return React.createElement('div', { className: 'text-center py-8' }, 'Loading statistics...');
+
+            const cards = [
+                { title: 'Total Events', value: stats.events?.total || 0, color: 'blue', icon: '📅' },
+                { title: 'Active Events', value: stats.events?.active || 0, color: 'green', icon: '🟢' },
+                { title: 'Total Reservations', value: stats.reservations?.total || 0, color: 'purple', icon: '📋' },
+                { title: 'Pending Reservations', value: stats.reservations?.pending || 0, color: 'yellow', icon: '⏳' },
+                { title: 'Confirmed Reservations', value: stats.reservations?.confirmed || 0, color: 'green', icon: '✅' },
+                { title: 'Total Venues', value: stats.venues?.total || 0, color: 'indigo', icon: '🏢' },
+                { title: 'Total Suites', value: stats.suites?.total || 0, color: 'pink', icon: '🏠' },
+                { title: 'Suite Contracts', value: stats.suites?.contracts || 0, color: 'gray', icon: '📄' }
+            ];
+
+            return React.createElement('div', null,
+                React.createElement('h2', { className: 'text-lg font-medium text-gray-900 mb-6' }, 'Dashboard Overview'),
+                React.createElement('div', { className: 'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4' },
+                    cards.map((card, index) =>
+                        React.createElement('div', { 
+                            key: index, 
+                            className: 'bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow'
+                        },
+                            React.createElement('div', { className: 'p-5' },
+                                React.createElement('div', { className: 'flex items-center' },
+                                    React.createElement('div', { className: 'flex-shrink-0' },
+                                        React.createElement('span', { className: 'text-2xl' }, card.icon)
+                                    ),
+                                    React.createElement('div', { className: 'ml-5 w-0 flex-1' },
+                                        React.createElement('dl', null,
+                                            React.createElement('dt', { className: 'text-sm font-medium text-gray-500 truncate' }, card.title),
+                                            React.createElement('dd', { className: 'text-lg font-medium text-gray-900' }, card.value)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // Reservations Tab Component
+        const ReservationsTab = ({ reservations, updateReservationStatus }) => {
+            return React.createElement('div', null,
+                React.createElement('h2', { className: 'text-lg font-medium text-gray-900 mb-6' }, 'Recent Reservations'),
+                React.createElement('div', { className: 'bg-white shadow overflow-hidden sm:rounded-md' },
+                    React.createElement('ul', { className: 'divide-y divide-gray-200' },
+                        reservations.length === 0 
+                            ? React.createElement('li', { className: 'px-6 py-4 text-center text-gray-500' }, 'No reservations found')
+                            : reservations.map(reservation =>
+                                React.createElement('li', { key: reservation.id, className: 'px-6 py-4 hover:bg-gray-50' },
+                                    React.createElement('div', { className: 'flex items-center justify-between' },
+                                        React.createElement('div', { className: 'flex-1' },
+                                            React.createElement('h4', { className: 'text-sm font-medium text-gray-900' }, reservation.event_organization),
+                                            React.createElement('p', { className: 'text-sm text-gray-500' }, 
+                                                `${reservation.event_type} • ${reservation.venue} • ${reservation.min_crowd_size}-${reservation.max_crowd_size} people`
+                                            ),
+                                            React.createElement('p', { className: 'text-xs text-gray-400' }, 
+                                                `Created: ${new Date(reservation.created_at).toLocaleDateString()}`
+                                            )
+                                        ),
+                                        React.createElement('div', { className: 'flex items-center space-x-2' },
+                                            React.createElement('span', { 
+                                                className: `px-2 py-1 text-xs font-medium rounded-full ${
+                                                    reservation.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                    reservation.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                    'bg-red-100 text-red-800'
+                                                }`
+                                            }, reservation.status),
+                                            React.createElement('select', {
+                                                onChange: (e) => updateReservationStatus(reservation.id, e.target.value),
+                                                className: 'text-xs border rounded px-2 py-1',
+                                                defaultValue: reservation.status
+                                            },
+                                                React.createElement('option', { value: 'pending' }, 'Pending'),
+                                                React.createElement('option', { value: 'confirmed' }, 'Confirmed'),
+                                                React.createElement('option', { value: 'cancelled' }, 'Cancelled')
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                    )
+                )
+            );
+        };
+
+        // Venues Tab Component
+        const VenuesTab = ({ venues }) => {
+            return React.createElement('div', null,
+                React.createElement('h2', { className: 'text-lg font-medium text-gray-900 mb-6' }, 'Venues'),
+                React.createElement('div', { className: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3' },
+                    venues.map(venue =>
+                        React.createElement('div', { 
+                            key: venue.id, 
+                            className: 'bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow'
+                        },
+                            React.createElement('h3', { className: 'text-lg font-medium text-gray-900 mb-2' }, venue.venue),
+                            React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, venue.address),
+                            React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, `Capacity: ${venue.capacity}`),
+                            React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, `Supervisor: ${venue.guy_in_charge}`),
+                            React.createElement('p', { className: 'text-sm text-gray-600' }, `${venue.reservation_count} reservations`)
+                        )
+                    )
+                )
+            );
+        };
+
+        // Suites Tab Component
+        const SuitesTab = ({ suites }) => {
+            return React.createElement('div', null,
+                React.createElement('h2', { className: 'text-lg font-medium text-gray-900 mb-6' }, 'Suites'),
+                React.createElement('div', { className: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3' },
+                    suites.map(suite =>
+                        React.createElement('div', { 
+                            key: suite.id, 
+                            className: 'bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow'
+                        },
+                            React.createElement('h3', { className: 'text-lg font-medium text-gray-900 mb-2' }, suite.suite_name),
+                            React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, `${suite.square_footage} sq ft`),
+                            React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, `$${suite.monthly_rent}/month`),
+                            React.createElement('p', { className: 'text-sm text-gray-600 mb-2' }, `${suite.contracts_count} contracts`),
+                            React.createElement('div', { className: 'text-xs text-gray-500' },
+                                suite.has_private_office && React.createElement('span', { className: 'inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded mr-1' }, 'Private Office'),
+                                suite.has_conference_room && React.createElement('span', { className: 'inline-block bg-green-100 text-green-800 px-2 py-1 rounded mr-1' }, 'Conference Room'),
+                                suite.desk_count > 0 && React.createElement('span', { className: 'inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded' }, `${suite.desk_count} desks`)
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // Entities Tab Component
+        const EntitiesTab = ({ entities }) => {
+            return React.createElement('div', null,
+                React.createElement('h2', { className: 'text-lg font-medium text-gray-900 mb-6' }, 'Individuals & Organizations'),
+                React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-8' },
+                    React.createElement('div', null,
+                        React.createElement('h3', { className: 'text-md font-medium text-gray-700 mb-4' }, 'Recent Individuals'),
+                        React.createElement('div', { className: 'bg-white shadow rounded-lg' },
+                            React.createElement('ul', { className: 'divide-y divide-gray-200' },
+                                entities.individuals.length === 0 
+                                    ? React.createElement('li', { className: 'px-6 py-4 text-center text-gray-500' }, 'No individuals found')
+                                    : entities.individuals.map(individual =>
+                                        React.createElement('li', { key: individual.id, className: 'px-6 py-4' },
+                                            React.createElement('h4', { className: 'text-sm font-medium text-gray-900' }, individual.full_name),
+                                            React.createElement('p', { className: 'text-sm text-gray-600' }, individual.email),
+                                            individual.organization && React.createElement('p', { className: 'text-xs text-gray-500' }, individual.organization)
+                                        )
+                                    )
+                            )
+                        )
+                    ),
+                    React.createElement('div', null,
+                        React.createElement('h3', { className: 'text-md font-medium text-gray-700 mb-4' }, 'Recent Organizations'),
+                        React.createElement('div', { className: 'bg-white shadow rounded-lg' },
+                            React.createElement('ul', { className: 'divide-y divide-gray-200' },
+                                entities.organizations.length === 0 
+                                    ? React.createElement('li', { className: 'px-6 py-4 text-center text-gray-500' }, 'No organizations found')
+                                    : entities.organizations.map(org =>
+                                        React.createElement('li', { key: org.id, className: 'px-6 py-4' },
+                                            React.createElement('h4', { className: 'text-sm font-medium text-gray-900' }, org.organization_name),
+                                            React.createElement('p', { className: 'text-sm text-gray-600' }, `Contact: ${org.contact_person}`),
+                                            React.createElement('p', { className: 'text-sm text-gray-600' }, org.email)
+                                        )
+                                    )
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // Mount the React app
+        const root = ReactDOM.createRoot(document.getElementById('admin-dashboard-root'));
+        root.render(React.createElement(AdminDashboard));
+    </script>
+
+    <!-- React 18 -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- CSRF Token -->
+    {% csrf_token %}
+</body>
+</html>

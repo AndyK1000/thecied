@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
@@ -25,7 +25,15 @@ import os
 
 def react_app(request):
     """Serve the React application"""
+    # Check if this is admin subdomain
+    host = request.get_host()
+    if host.startswith('admin.'):
+        return redirect('/admin_dashboard/')
     return render(request, 'index.html')
+
+def reserve_page(request):
+    """Serve the reserve page"""
+    return render(request, 'reserve/index.html')
 
 def legacy_home(request):
     """Legacy home page for reference"""
@@ -78,8 +86,10 @@ def legacy_home(request):
 
 urlpatterns = [
     path('', react_app, name='home'),
+    path('reserve/', reserve_page, name='reserve'),
     path('legacy/', legacy_home, name='legacy_home'),  # Keep old home for reference
     path('admin/', admin.site.urls),
+    path('admin_dashboard/', include('admin_dashboard.urls')),
     path('events/', include('events.urls')),
     # Serve images at /images/ for React app compatibility
     path('images/<path:path>', serve, {
@@ -87,8 +97,9 @@ urlpatterns = [
     }),
 ]
 
-# Serve static files in development
+# Serve static and media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -24,9 +24,9 @@ SECRET_KEY = 'django-insecure-vl46u$(^ws5n*6)ajnbr@6@&(u#6n)h$0&u&d4^3e-6omuw*zu
 
 # SECURITY WARNING: don't run with debug turned on in production!
 import os
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = True  # Enable DEBUG for development to serve static files
 
-ALLOWED_HOSTS = ['thecied.dev', 'www.thecied.dev', '98.87.71.5', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['thecied.dev', 'www.thecied.dev', 'admin.thecied.dev', '98.87.71.5', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'events',
+    'entitypool',
+    'manage_suites',
+    'admin_dashboard',
 ]
 
 MIDDLEWARE = [
@@ -121,6 +124,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
