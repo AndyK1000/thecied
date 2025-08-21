@@ -47,18 +47,14 @@ class SuiteOperatingModelsAdmin(admin.ModelAdmin):
 
 @admin.register(SuiteContracts)
 class SuiteContractsAdmin(admin.ModelAdmin):
-    list_display = ['roe_id', 'suite', 'entity', 'model', 'roe_begin', 'roe_end', 'on_going']
-    list_filter = ['roe_begin', 'roe_end', 'on_going', 'individual', 'organization']
+    list_display = ['roe_id', 'suite', 'model', 'roe_begin', 'roe_end', 'on_going']
+    list_filter = ['roe_begin', 'roe_end', 'on_going']
     search_fields = ['suite__suite_number']
     ordering = ['-roe_begin']
     
     fieldsets = (
         ('Contract Details', {
             'fields': ('suite', 'model')
-        }),
-        ('Entity Information', {
-            'fields': ('individual', 'organization'),
-            'description': 'Select either an individual OR an organization (not both)'
         }),
         ('Contract Duration', {
             'fields': ('roe_begin', 'on_going', 'roe_end'),
@@ -75,7 +71,3 @@ class SuiteContractsAdmin(admin.ModelAdmin):
         css = {
             'all': ('admin/css/widgets.css',)
         }
-    
-    def entity(self, obj):
-        return str(obj.get_entity())
-    entity.short_description = 'Entity'

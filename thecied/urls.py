@@ -21,6 +21,8 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
+from django.contrib.auth import logout
+from admin_dashboard.views import dashboard_view
 import os
 
 def react_app(request):
@@ -29,11 +31,27 @@ def react_app(request):
     host = request.get_host()
     if host.startswith('admin.') or 'admin.' in host:
         return redirect('/admin_dashboard/')
-    return render(request, 'index.html')
+    
+    # Check if user is authenticated as admin
+    if not request.user.is_authenticated or not request.user.is_staff:
+        # Serve the "not yet" page for non-admin users
+        return render(request, 'notyet.html')
+    
+    # Serve main landing page for authenticated admin users
+    return render(request, 'index_admin.html')
 
 def reserve_page(request):
     """Serve the reserve page"""
     return render(request, 'reserve/index.html')
+
+def calendar_page(request):
+    """Serve the calendar page"""
+    return render(request, 'calendar.html')
+
+def logout_view(request):
+    """Logout user and redirect to home"""
+    logout(request)
+    return redirect('/')
 
 def legacy_home(request):
     """Legacy home page for reference"""
@@ -88,9 +106,15 @@ urlpatterns = [
     path('', react_app, name='home'),
     path('reserve/', reserve_page, name='reserve'),
     path('legacy/', legacy_home, name='legacy_home'),  # Keep old home for reference
+    path('logout/', logout_view, name='logout'),
     path('admin/', admin.site.urls),
     path('admin_dashboard/', include('admin_dashboard.urls')),
     path('events/', include('events.urls')),
+    # New app routes
+    path('chat/', include('chat.urls')),
+    path('status/', include('system_status.urls')),
+    path('dashboard/', dashboard_view, name='dashboard'),
+    path('calendar/', calendar_page, name='calendar'),
     # Serve images at /images/ for React app compatibility
     path('images/<path:path>', serve, {
         'document_root': os.path.join(settings.STATIC_ROOT, 'images')

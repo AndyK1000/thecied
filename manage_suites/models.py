@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from datetime import timedelta
-from entitypool.models import Organizations, Individuals
+# from entitypool.models import Organizations, Individuals
 
 
 class SuitePhoto(models.Model):
@@ -59,8 +59,8 @@ class SuiteContracts(models.Model):
     suite = models.ForeignKey(Suites, on_delete=models.CASCADE)
     
     # Direct foreign keys to handle both Organizations and Individuals
-    individual = models.ForeignKey(Individuals, on_delete=models.CASCADE, null=True, blank=True)
-    organization = models.ForeignKey(Organizations, on_delete=models.CASCADE, null=True, blank=True)
+    # individual = models.ForeignKey(Individuals, on_delete=models.CASCADE, null=True, blank=True)
+    # organization = models.ForeignKey(Organizations, on_delete=models.CASCADE, null=True, blank=True)
     
     model = models.ForeignKey(SuiteOperatingModels, on_delete=models.CASCADE)
     roe_begin = models.DateField()
@@ -79,11 +79,11 @@ class SuiteContracts(models.Model):
         super().clean()
         
         # Ensure exactly one entity is selected
-        if not self.individual and not self.organization:
-            raise ValidationError('You must select either an individual or an organization.')
+        # if not self.individual and not self.organization:
+        #     raise ValidationError('You must select either an individual or an organization.')
         
-        if self.individual and self.organization:
-            raise ValidationError('You cannot select both an individual and an organization. Choose one.')
+        # if self.individual and self.organization:
+        #     raise ValidationError('You cannot select both an individual and an organization. Choose one.')
         
         # Ensure end date is provided if not ongoing
         if not self.on_going and not self.roe_end:
@@ -95,8 +95,8 @@ class SuiteContracts(models.Model):
     
     def get_entity(self):
         """Return the associated individual or organization"""
-        if self.individual:
-            return self.individual
-        elif self.organization:
-            return self.organization
+        # if self.individual:
+        #     return self.individual
+        # elif self.organization:
+        #     return self.organization
         return None

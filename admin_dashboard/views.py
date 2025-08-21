@@ -53,6 +53,15 @@ def admin_dashboard_view(request):
     return render(request, 'admin/dashboard.html')
 
 
+def dashboard_view(request):
+    """Public dashboard view - redirects to admin dashboard if authenticated"""
+    if request.user.is_authenticated and request.user.is_staff:
+        return admin_dashboard_view(request)
+    else:
+        # Serve a public dashboard or redirect to login
+        return render(request, 'dashboard.html')
+
+
 # API Endpoints for Admin Dashboard
 @login_required
 @user_passes_test(is_admin)
